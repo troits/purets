@@ -407,6 +407,10 @@ function romanToInt(s: string): number {
 }
 
 function findInSortedRight(sortedValues: number[][], value: number): number {
+    if (sortedValues.length === 0) {
+        return -1;
+    }
+
     let start = 0;
     let end = sortedValues.length - 1;
     if (sortedValues[start][0] > value) {
@@ -457,6 +461,9 @@ function findInSortedRight(sortedValues: number[][], value: number): number {
 }
 
 function findInSortedLeft(sortedValues: number[][], value: number): number {
+    if (sortedValues.length === 0) {
+        return -1;
+    }
     let start = 0;
     let end = sortedValues.length - 1;
     if (sortedValues[end][0] < value) {
@@ -490,59 +497,66 @@ function findInSortedLeft(sortedValues: number[][], value: number): number {
 }
 
 function countFairPairs(nums: number[], lower: number, upper: number): number {
-    if (upper < lower) {
+    if (upper < lower || nums.length < 2) {
         return 0;
     }
 
     const numIdxs = nums.map((n, idx) => [n, idx]).sort((a, b) => a[0] - b[0]);
 
-    const resMap = new Map<number, number[]>();
-
-    const findInSortedLeftCache = new Map<number, number>();
-    const findInSortedRightCache = new Map<number, number>();
-
-    for (let i = 0; i < numIdxs.length; i++) {
-        const val = numIdxs[i][0];
-        const hasLCache = findInSortedLeftCache.has(lower - val);
-        const hasRCache = findInSortedRightCache.has(upper - val);
-        const i1 =
-            (hasLCache
-                ? findInSortedLeftCache.get(lower - val)
-                : findInSortedLeft(numIdxs, lower - val)) ?? -1;
-
-        const i2 =
-            (hasRCache
-                ? findInSortedRightCache.get(upper - val)
-                : findInSortedRight(numIdxs, upper - val)) ?? -1;
-
-        if (!hasLCache) {
-            findInSortedLeftCache.set(lower - val, i1);
-        }
-        if (!hasRCache) {
-            findInSortedRightCache.set(upper - val, i2);
-        }
-
-        if (i1 < 0 || i2 < 0) {
-            continue;
-        }
-        for (let j = i1; j <= i2; j++) {
-            if (numIdxs[j][1] <= numIdxs[i][1]) {
-                continue;
-            }
-            const idxs = resMap.get(numIdxs[i][1]) ?? [];
-            idxs.push(numIdxs[j][1]);
-            resMap.set(numIdxs[i][1], idxs);
-        }
+    if (
+        numIdxs[0][0] + numIdxs[1][0] >= lower &&
+        numIdxs[numIdxs.length - 1][0] + numIdxs[numIdxs.length - 1][0] <= upper
+    ) {
+        return ((numIdxs.length - 1) * numIdxs.length) / 2;
     }
 
     let res = 0;
-    for (const e of resMap.entries()) {
-        res += e[1].length;
+
+    for (let i = 0; i < numIdxs.length; i++) {
+        const currVal = numIdxs[i][0];
+        const currIdx = numIdxs[i][1];
+        const i1 = findInSortedLeft(numIdxs, lower - currVal);
+        const i2 = findInSortedRight(numIdxs, upper - currVal);
+
+        if (i1 < 0 || i2 < 0 || i2 < i1) {
+            continue;
+        }
+
+        res += i2 - i1 + 1;
+        if (i1 <= i && i <= i2) {
+            res--;
+        }
     }
 
-    return res;
+    return res / 2;
 }
 
-const myEl = document.createElement("div");
-myEl.innerText = countFairPairs([0, 1, 7, 4, 4, 5], 3, 6).toString();
-document.body.appendChild(myEl);
+function countFairPairs_(nums: number[], lower: number, upper: number): number {
+    if (upper < lower) {
+        return 0;
+    }
+
+    const allPairs: number[][] = [];
+    for (let i = 0; i < nums.length; i++) {
+        for (let j = i + 1; j < nums.length; j++) {
+            if (nums[i] + nums[j] <= upper && nums[i] + nums[j] >= lower) {
+                allPairs.push([nums[i] + nums[j], i, j]);
+            }
+        }
+    }
+
+    return allPairs.length;
+}
+
+const arr = [-8];
+
+const MyDiv = document.createElement("div");
+MyDiv.textContent = "  ";
+document.body.appendChild(MyDiv);
+
+const myBtn = document.createElement("button");
+myBtn.textContent = "Calculate";
+myBtn.onclick = () => {
+    MyDiv.innerHTML = countFairPairs(arr, -7, 20).toString();
+};
+document.body.appendChild(myBtn);
