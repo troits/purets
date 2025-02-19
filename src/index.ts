@@ -550,6 +550,8 @@ function countFairPairs_(nums: number[], lower: number, upper: number): number {
 
 const arr = [-8];
 
+let atomMark: [string] | [string, string] = [] as any as [string];
+
 const MyDiv = document.createElement("div");
 MyDiv.textContent = "  ";
 document.body.appendChild(MyDiv);
