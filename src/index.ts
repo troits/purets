@@ -548,6 +548,26 @@ function countFairPairs_(nums: number[], lower: number, upper: number): number {
     return allPairs.length;
 }
 
+function calcSumDigits(n: number): number {
+    let res = 0;
+    let currN = n;
+    while (currN > 0) {
+        res += currN % 10;
+        currN = Math.floor(currN / 10);
+    }
+    return res;
+}
+
+function check3Digits(): number {
+    let res = 0;
+    for (let i = 0; i <= 400; i++) {
+        if (calcSumDigits(i) <= 4) {
+            res++;
+        }
+    }
+    return res;
+}
+
 const arr = [-8];
 
 let atomMark: [string] | [string, string] = [] as any as [string];
@@ -559,6 +579,6 @@ document.body.appendChild(MyDiv);
 const myBtn = document.createElement("button");
 myBtn.textContent = "Calculate";
 myBtn.onclick = () => {
-    MyDiv.innerHTML = countFairPairs(arr, -7, 20).toString();
+    MyDiv.innerHTML = check3Digits().toString();
 };
 document.body.appendChild(myBtn);
